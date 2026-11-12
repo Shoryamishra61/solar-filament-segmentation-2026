@@ -145,9 +145,10 @@ all-data budget to 32{,}768 steps added $+0.0039$ filtered fold-1 PQ
 (0.4287$\to$0.4326), and the sweep filter $+0.0056$ more (0.4382). All calibrated
 scores reproduce the official scorer exactly (zero-difference parity on every
 photograph). The submitted flagship CSV (public leaderboard 0.37, submission
-57826506) is regenerated \emph{byte-identically} ($\mathrm{SHA}\text{-}256$
-\texttt{d6b9cfa9\ldots}) by the pinned notebook; a determinism re-run of the
-inference produced identical bytes.
+57826506) is preserved hash-exactly; re-executing the pinned notebook logic on
+a different GPU class reproduces the identical 1015-instance structure with
+949/1015 masks byte-identical (cuDNN algorithm variance), and a determinism
+re-run of the audit chain reproduced its CSV byte-for-byte.
 
 \subsection{Measured Negative Results}
 Because the promotion protocol records every branch, we can report what did

@@ -30,16 +30,26 @@ all top-5 sweep points ≥ 0.4337.
 
 ### 2026-11-13 re-verification of the submitted artifact
 
-- The flagship submission CSV (Kaggle ref **57826506**, public **0.37**) was
-  regenerated end-to-end from the pinned weights
-  (`alldata_convnext_32768.pt`, SHA-256 `843abc8d…`) with the notebook's exact
-  inference logic on the original GPU: **byte-identical**,
-  SHA-256 `d6b9cfa9492e8be6a2d67ac66f72066347eec542662953ce3e8353bc70fcf814`,
-  1015 rows over 176/180 photographs, strict disjointness PASS
-  (`evidence/reproduction/flagship_submission.audit.json`).
+- The **exact bytes** of the flagship submission (Kaggle ref **57826506**,
+  public **0.37**) are preserved from the era kernel output
+  (`state/flagship-log/submission.csv`, produced on a Kaggle P100) and
+  hash-verified: `d6b9cfa9492e8be6a2d67ac66f72066347eec542662953ce3e8353bc70fcf814`,
+  1015 rows over 176/180 photographs.
+- A fresh end-to-end re-execution of the notebook's inference logic on the
+  original local GPU (RTX 3050, torch 2.6.0+cu124) reproduced the submission
+  **structurally exactly** — same 1015 instances in the same order, same
+  photograph coverage, all filter decisions identical — with **949/1015 masks
+  byte-identical** (mean IoU 0.988 on the remaining 66, mean 22 px boundary
+  difference). The residual difference is cuDNN algorithm-selection variance
+  across GPU models (era kernel ran on P100), not a pipeline difference; the
+  notebook on a Kaggle T4/P100 is the byte-parity path.
 - All three shipped checkpoints match `weights_manifest.json` exactly.
 - The generic ImageNet backbone file referenced by the training code matches
   its pinned SHA-256 (`4bee155ff6…`); no task-specific external weights exist.
+- The champion-064 audit chain (see REPRODUCTION_REPORT.md) is fully
+  byte-exact, including its one GPU-inferred component, because that R34
+  model's inference is bit-stable on the original hardware and the refinement
+  stages are deterministic image-space operations.
 
 ## 2. Integrity audit of the historical 0.56 artifact
 
@@ -74,6 +84,14 @@ an honest submission** and is retained only as an audit target; it was never
 used as training signal. The user's Kaggle **selected** submission decision
 remains theirs to make (both the 0.56 payload family and Candidate 86 score
 0.56 on the public board; the honest flagship scores 0.37).
+
+**Head-to-head control on the identical evaluation basis** (same 139 photos,
+same 1630 public records, same scorer): the honest flagship submission scores
+**PQ 0.413** (SQ 0.693, TP 853 / FP 380 / FN 777) where the 0.56 artifact
+scores **0.653** — a +0.24 gap explainable only by the payload's information
+source. Raw JSON:
+`evidence/reproduction/flagship_vs_public_gt.json` and
+`evidence/reproduction/payload_vs_public_gt.json`.
 
 ### Public-leaderboard context (verified 2026-11-13)
 - Public LB: rank 19 at 0.56 (team `shoryakumar mishra`, 29 submissions) — matches the user's report.

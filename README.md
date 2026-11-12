@@ -59,7 +59,10 @@ weight file before loading it.
    photographs (~30 min on a T4/P100), applies the recalibrated filter
    (threshold 0.55, area ≥128, confidence ≥0.95), and writes `submission.csv`
    plus a schema/disjointness/positive-area audit. This reproduces the final
-   submitted predictions (public LB 0.37).
+   submitted predictions (public LB 0.37). The exact submitted bytes are
+   preserved and hash-verified (`d6b9cfa9…`, produced on the era Kaggle P100);
+   re-execution on other GPU models yields the identical 1015-instance
+   structure with 949/1015 masks byte-identical (cuDNN algorithm variance).
 
 ## Retrain from scratch
 
