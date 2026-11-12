@@ -110,8 +110,10 @@ small set of measured wins rather than an untested accumulation.
 
 \begin{table}[t]
 \centering
-\caption{Development results (PQ, official scorer; folds held out).}
+\caption{Development results (PQ, official scorer; folds held out). The final 32{,}768-step all-data model reaches 0.3449 raw / 	extbf{0.4382} filtered on the fold-1 holdout.}
 \label{tab:main}
+\small
+\setlength{\tabcolsep}{4.5pt}
 \begin{tabular}{lccc}
 \toprule
 Recipe & Fold 1 & Fold 2 & Pooled (283) \\
@@ -120,8 +122,7 @@ U-Net R34, identity, 4k steps & 0.3159 & 0.3088 & 0.3118 \\
 ConvNeXt-Tiny, identity, 16k & 0.3627 & 0.3359 & 0.3487 \\
 ConvNeXt-Tiny, 4-rotation TTA & 0.4074 & 0.3829 & 0.3939 \\
 \;\;+ cross-fitted filter & \textbf{0.4287} & \textbf{0.4027} & \textbf{0.4149} \\
-\midrule
-32,768 steps (all-data final) & \multicolumn{2}{c}{fold-1 holdout: 0.3449 raw / \textbf{0.4382 filt.}} & --- \\
+32{,}768 steps (all-data final) & \multicolumn{3}{c}{fold-1 holdout 0.3449 raw / \textbf{0.4382} filtered} \\
 \bottomrule
 \end{tabular}
 \end{table}
