@@ -6,7 +6,7 @@ evidence ends, that is stated.
 
 ## 1. Primary project (fully recovered)
 
-**Location:** `D:\zcode\workspace\default\kaggle-work\solar_filament\` (8.5 GB, git repo,
+**Location:** `<recovered-project>/` (local path redacted) (8.5 GB, git repo,
 initial commit 2026-10-29 "Final solution: consensus-aware ConvNeXt U-Net + evaluation
 investigation", HEAD `ccf0a5f` 2026-11-07).
 
@@ -62,7 +62,7 @@ later added a recovered prediction for that image at the same 0.56.
 - `data/cosine95-project/runs/cosine95-long-fold1-test-001/predictions.json`
   (retained-listed in the Oct 20 eviction receipt but the whole `data/` tree is gone).
 - The October 2026 ZCode session transcripts: no filament sessions exist in
-  `~/.zcode/cli/db/db.sqlite` (only a scheduled-automation session from Oct 25
+  the local agent session database (path redacted) (only a scheduled-automation session from Oct 25
   survives); the per-session rollout/agent stores contain no champion-era content.
 - The organizer Overleaf template source (login-gated; not downloaded at the time).
 
