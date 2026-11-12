@@ -1,0 +1,17 @@
+{
+  "mode": "adaptive",
+  "source_csv": "proj\\runs\\champion-055-submission-001\\submission.csv",
+  "source_sha256": "5bf460da16419888bae2676d80664fd5a7104ba489efa6d7121194df4ba2bce0",
+  "out_csv": "proj\\runs\\champion-064-adaptive-physics-001\\submission.csv",
+  "out_sha256": "e17c2e26655ff6200807181d4ea69f4c3b6884fd60cfdbad01a20bb9423ad0c6",
+  "target_sha256": "e17c2e26655ff6200807181d4ea69f4c3b6884fd60cfdbad01a20bb9423ad0c6",
+  "match": true,
+  "stats": {
+    "total_processed": 1345,
+    "shaved_pixels_total": 255289,
+    "orig_area_total": 2887776,
+    "refined_area_total": 2632487,
+    "preserved_fallback": 0,
+    "alpha": 0.25
+  }
+}

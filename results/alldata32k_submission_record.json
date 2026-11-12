@@ -1,0 +1,14 @@
+{
+ "submission_ref": 57777436,
+ "public_score": 0.37,
+ "status": "COMPLETE",
+ "rows": 1489,
+ "photos": 179,
+ "csv_sha256": "3da8e82a4526cb822cb80bf80941f314043083880e7497e86ff7c5f8bcf0b35a",
+ "training": {
+  "steps": 32768,
+  "photos": 707,
+  "evidence": "fold1-holdout measured +0.0039 filtered PQ vs 16k (0.4326 vs 0.4287)"
+ },
+ "note": "New strongest honest artifact. All-data 32k recipe; audit passed."
+}

@@ -1,0 +1,5 @@
+{
+ "convnext_long_fold1_16384.pt": "57896d54ce01bb3e81900adce83fc8906a3d0cfadcfcb1ce5ac5a71bf63c6ae4",
+ "alldata_convnext_16384.pt": "c78d79d601d95f9e3072bade79c6553aaccf8c39bf7b20c12bcdae0d04a18c08",
+ "alldata_convnext_32768.pt": "843abc8dbcac3dbdd1128a0213ef705fe1dd1549f43ccafbbaed9f863473e7f4"
+}

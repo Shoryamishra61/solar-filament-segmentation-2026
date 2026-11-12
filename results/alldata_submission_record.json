@@ -1,0 +1,18 @@
+{
+ "submission_ref": 57647891,
+ "public_score": 0.36,
+ "status": "COMPLETE",
+ "rows": 1599,
+ "photos": 180,
+ "csv_sha256": "af44a61ff3cd6e022fb95d4238122fb001452124a4e0b28430ae0a755d495280",
+ "checkpoint_sha256": "c78d79d601d95f9e3072bade79c6553aaccf8c39bf7b20c12bcdae0d04a18c08",
+ "training": {
+  "steps": 16384,
+  "photos": 707,
+  "elapsed_seconds": 7026,
+  "amp_overflows": 9,
+  "loss_first16": 1.4627,
+  "loss_last16": 0.2889
+ },
+ "note": "Honest all-data model: identical fold-validated recipe trained on all 707 photos; audit passed (disjoint, positive-area, 180/180 coverage)."
+}

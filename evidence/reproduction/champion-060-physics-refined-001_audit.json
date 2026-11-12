@@ -1,0 +1,16 @@
+{
+  "mode": "refined",
+  "source_csv": "proj\\runs\\champion-055-submission-001\\submission.csv",
+  "source_sha256": "5bf460da16419888bae2676d80664fd5a7104ba489efa6d7121194df4ba2bce0",
+  "out_csv": "proj\\runs\\champion-060-physics-refined-001\\submission.csv",
+  "out_sha256": "fbf487976803b0895b4e8d0382242395aace65aeb7625ecce2f3253a16b5c57e",
+  "target_sha256": "fbf487976803b0895b4e8d0382242395aace65aeb7625ecce2f3253a16b5c57e",
+  "match": true,
+  "stats": {
+    "total_processed": 1345,
+    "shaved_pixels_total": 154973,
+    "orig_area_total": 2887776,
+    "refined_area_total": 2732803,
+    "preserved_fallback": 0
+  }
+}

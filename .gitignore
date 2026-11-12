@@ -1,0 +1,22 @@
+# data and outputs
+data/
+*.jpeg
+*.jpg
+*.png
+!report/figures/*.png
+!report/qualitative.png
+*.csv
+!tests/fixtures/*.csv
+audit/out/
+runs/
+tmp_kernel*/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+*.aux
+*.log
+!requirements.txt
+*.synctex.gz
+.env

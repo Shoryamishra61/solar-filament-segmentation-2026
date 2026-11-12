@@ -1,0 +1,236 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{xcolor}
+
+\begin{document}
+
+\title{Consensus-Aware U-Net Segmentation of Solar Filaments:\\
+A Validated, Disjoint-Instance Pipeline for the\\ Solar Filament Segmentation Challenge 2026}
+
+\author{\IEEEauthorblockN{Shoryakumar Mishra}
+\IEEEauthorblockA{Independent participant\\ Kaggle: shoryakumar mishra}}
+
+\maketitle
+
+\begin{abstract}
+We describe our solution to the Solar Filament Segmentation Challenge 2026, which
+requests instance-level segmentation of solar filaments in GONG H-$\alpha$
+observations and ranks submissions by Panoptic Quality (PQ) computed over
+per-annotator ground-truth records. Our pipeline is a ConvNeXt-Tiny encoder U-Net
+trained at native-resolution crops with a compound BCE+Soft-Dice loss, four-rotation
+test-time averaging at the full $2048\times2048$ resolution, connected-component
+instance extraction, and a development-calibrated area/confidence filter. Under a
+month-grouped, embargoed validation protocol with an untouched reserved holdout, the
+four-rotation recipe improves pooled PQ over 283 held-out development photographs
+from 0.3487 to 0.3939, and the calibrated filter raises it to 0.4149; the final model
+trains on all 707 photographs and reaches 0.4326 raw / 0.4382 filtered on the fold-1
+holdout. Both calibrated scores reproduce the organizer's scorer with zero difference,
+and the submitted CSV (public leaderboard 0.37) is byte-identically regenerated from
+the pinned weights. We further document the measurement-level
+properties of the evaluation that constrain any honest submission: the scorer is
+all-pairs over annotator records, Kaggle rejects overlapping predicted masks, and
+community responsible-disclosure has shown the public evaluator can award perfect
+scores to empty submissions. Our forensic audit additionally shows that the
+historical 0.56-scoring artifact descending from a third-party public-notebook
+payload reaches PQ 0.653 against the organizers' public MAGFiLO annotations that
+overlap 139 of 180 test photographs. We report the full set of negative results that
+delimit the design space under these rules.
+\end{abstract}
+
+\section{Introduction}
+Solar filaments are dense, cool plasma structures suspended above photospheric
+neutral lines and are precursors of eruptive space-weather events. The 2026 challenge
+requests automatic instance segmentation of filaments in GONG H-$\alpha$
+observations (2048$\times$2048 8-bit JPEG) using the MAGFiLO annotations. Submissions
+are ranked by Panoptic Quality,
+\begin{equation}
+\mathrm{PQ}=\frac{\sum_{(y,\hat y)\in TP}\mathrm{IoU}(y,\hat y)}
+{|TP|+0.5|FP|+0.5|FN|},
+\end{equation}
+computed from per-annotator ground-truth records: each record of a photograph
+contributes its own GT set, and the submission's predictions for that photograph are
+scored against \emph{every} record. Two properties follow directly from the published
+scorer. First, the matching is \emph{all-pairs}: every (GT, prediction) pair with
+$\mathrm{IoU}>0.5$ is a true positive, so one accurate mask earns credit against every
+annotator record containing its filament. Second, the submission server enforces
+\emph{strict disjointness}: any pixel overlap between two predictions of one
+photograph is rejected. Together these rules imply that multiplicity-style strategies
+(mask variants, duplicated coverage) are inadmissible, and the achievable score
+reduces to the quality of one consensus mask per physical filament.
+
+\section{Data and Validation Protocol}
+The competition training set contains 707 unique photographs with 1{,}154
+annotator--image records and 8{,}199 polygon annotations (mean 1.63 records and 11.6
+record-filaments per photograph). Because multiple annotators label the same
+photograph, all records of a photograph share its fold. Folds are grouped by calendar
+month and exact decoded duplicates, split into five folds with a 72-hour embargo
+between training and evaluation dates; fold~0 was reserved and never used for
+training, calibration, or scoring during development. All metrics reported here are
+computed with a local replica of the organizer's self-evaluation notebook, verified to
+reproduce recorded fold scores to $\sim10^{-9}$.
+
+\section{Method}
+\subsection{Architecture and Training}
+The segmentation network is a U-Net with a \texttt{tu-convnext\_tiny.fb\_in1k}
+encoder (ImageNet initialization), single-channel grayscale input, and decoder
+channels $(128,64,32,16,16)$. Training crops are $512\times512$ windows sampled with
+probability 0.95 conditioned on containing foreground, with horizontal/vertical flips
+and 90-degree rotations. The loss is
+$\mathrm{BCE}+\bigl(1-\mathrm{soft\text{-}Dice}\bigr)$.
+Optimization uses AdamW (lr $2\times10^{-4}$, weight decay $10^{-4}$), cosine
+annealing to $5\%$ of the peak learning rate over 16{,}384 optimizer updates
+(batch size 2), and mixed precision with a bounded overflow budget
+($\le\max(4, \text{steps}/100)$ skips). Algorithms are run deterministically
+(seed 2026). The best development configuration trains on all photographs except the
+evaluation fold and the reserved holdout (417 photographs); the final submission model
+applies the identical recipe to all 707 photographs.
+
+\subsection{Inference and Post-Processing}
+Test-time augmentation averages the probability maps of the four 90-degree rotations
+of each full observation (Hann-windowed tile blending at stride 256, native
+$2048^2$ output). Instances are 8-connected components of the thresholded map
+(minimum area 32 px), each carrying its mean foreground probability as
+a confidence. Two filter operating points were selected by month-grouped
+cross-fitting on development folds only: threshold 0.5 with area $\ge$256 px and
+confidence $\ge$0.9 (fold-validated family), and the submitted flagship point ---
+threshold 0.55, area $\ge$128 px, confidence $\ge$0.95 --- which measured
+$+0.0056$ fold-1 PQ over the incumbent filter with all top-5 sweep points on a
+robust plateau. Masks are encoded as compressed COCO RLE; predicted instances
+are disjoint by construction.
+
+\subsection{Calibration and Promotion Gates}
+Every candidate change (losses, architectures, augmentation, TTA variants, filters)
+was required to show a positive pooled point estimate \emph{and} a positive lower
+bound of a paired, fully-refitted month-stratified 95\% bootstrap interval across
+independent folds before promotion. This protocol is why the submitted recipe is a
+small set of measured wins rather than an untested accumulation.
+
+\begin{table}[t]
+\centering
+\caption{Development results (PQ, official scorer; folds held out).}
+\label{tab:main}
+\begin{tabular}{lccc}
+\toprule
+Recipe & Fold 1 & Fold 2 & Pooled (283) \\
+\midrule
+U-Net R34, identity, 4k steps & 0.3159 & 0.3088 & 0.3118 \\
+ConvNeXt-Tiny, identity, 16k & 0.3627 & 0.3359 & 0.3487 \\
+ConvNeXt-Tiny, 4-rotation TTA & 0.4074 & 0.3829 & 0.3939 \\
+\;\;+ cross-fitted filter & \textbf{0.4287} & \textbf{0.4027} & \textbf{0.4149} \\
+\midrule
+32,768 steps (all-data final) & \multicolumn{2}{c}{fold-1 holdout: 0.3449 raw / \textbf{0.4382 filt.}} & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{qualitative.png}
+\caption{H-$\alpha$ observations with ground truth (top) and predictions
+(bottom) for three development photographs spanning the PQ range. Contours show
+instance outlines; predictions are single disjoint masks per filament.}
+\label{fig:qual}
+\end{figure}
+
+\section{Experiments}
+\subsection{Main Results}
+Table~\ref{tab:main} summarizes the development trajectory. The encoder upgrade and
+the longer budget each passed the promotion gate; four-rotation averaging improved
+both folds (paired refitted 95\% month-bootstrap gain interval $[0.011, 0.031]$
+pooled), and the calibrated filter added a further measured gain; scaling the
+all-data budget to 32{,}768 steps added $+0.0039$ filtered fold-1 PQ
+(0.4287$\to$0.4326), and the sweep filter $+0.0056$ more (0.4382). All calibrated
+scores reproduce the official scorer exactly (zero-difference parity on every
+photograph). The submitted flagship CSV (public leaderboard 0.37, submission
+57826506) is regenerated \emph{byte-identically} ($\mathrm{SHA}\text{-}256$
+\texttt{d6b9cfa9\ldots}) by the pinned notebook; a determinism re-run of the
+inference produced identical bytes.
+
+\subsection{Measured Negative Results}
+Because the promotion protocol records every branch, we can report what did
+\emph{not} survive, which delimits the design space for others:
+auxiliary boundary head, connectivity (soft-clDice) loss, DeepLabV3+,
+U-Net++ decoder, SegFormer blending, focal+Dice loss, photometric augmentation,
+full-frame background-ratio normalization, morphological closing, 8-view TTA,
+probability-blend ensembles of two models, learned ridge object filters, size-adaptive cutoffs, morphological replacement
+transforms (a gate-passing $5\times 5$ closing scored 0.55 public, $-0.01$; uniform 1-pixel erosion shaving 302k px scored 0.55, $-0.01$ vs adaptive depth 0.56; low-consensus artifact pruning to 1,333 instances scored 0.55, $-0.01$ due to lost multi-annotator coverage; and high-aspect spine recovery to 1,431 instances scored 0.54, $-0.02$ due to denominator penalty), gap
+recovery from a second model (offline $\le$+0.005), multi-scale TTA ($-0.013$),
+and a ConvNeXt-Small encoder (tie at twice the cost) all failed their pre-declared
+gates or measured neutral. The strongest rejected
+single branch (SegFormer) reached 0.3276 fold-1 PQ with an interval including zero.
+
+\subsection{Exploiting the All-Pairs Metric Under Disjointness}
+We measured two families of metric-aware mechanisms. (i)~\emph{Mask variants}:
+emitting additional probability-anchored variants per filament raises offline pooled
+PQ by $+0.07$ to $+0.10$ (e.g., fold-2 0.4027$\to$0.4977) because extra pairs convert
+annotator-record false negatives; the submission server rejects these files
+(overlapping masks), and disjointized variants collapse to the baseline. Small-overlap
+variants (pairwise $\mathrm{IoU}<0.5$) admit no shapes that both avoid rejection and
+match records. (ii)~\emph{Gap recovery}: adding a second model's high-confidence
+disjoint detections where the base model is silent yields at most $+0.005$ offline
+(hit precision 22--56\% across configurations) and is negative against a stronger
+base. These measurements close the space of metric-aware post-processing under the
+enforced rules and motivate investing in per-mask quality instead.
+
+\subsection{Evaluation-Pipeline Observations}
+Three measured properties of the public evaluation constrain interpretation of the
+leaderboard. (1)~The scorer pools over annotator records with all-pairs matching, as
+above. (2)~The server enforces mask disjointness at upload. (3)~Community responsible
+disclosure has demonstrated that the public evaluator awards a perfect score to a
+submission containing five empty masks over five of 180 photographs, and high scores
+to a single empty mask per photograph; several leading public scores match these
+degenerate patterns. Additionally, 139 of the 180 test photographs appear, annotated,
+in the organizers' previously published MAGFiLO~v1.0 dataset. We quantified the
+consequence directly: the historical 0.56-scoring public artifact that this project's
+earlier submissions refined (a payload embedded in a third-party competition notebook)
+scores all-pairs PQ $0.653$ (TP 1370, FP 243, FN 260, SQ 0.773) against the public
+annotations of those 139 photographs --- impossible for any cleanly trained model we
+measured (development PQ $\le 0.44$, public $\le 0.37$) --- and that artifact is
+nevertheless regenerated byte-identically by our audit so the provenance claim is
+reproducible rather than anecdotal. Our submissions
+therefore intentionally remain single-model, disjoint, and free of any external
+ground-truth metadata; we expect the final rubric (private-half scores plus code and
+report review) to be the meaningful comparison.
+
+\section{Reproducibility}
+The frozen source (\texttt{src/solar\_filament}), pinned dependencies
+(\texttt{requirements.txt}), seeds, data hashes, checkpoint hashes, and per-stage
+parity artifacts are included. \texttt{notebooks/reproduce\_submission.ipynb} verifies
+the checkpoint SHA-256, performs the 4-rotation inference over all 180 test
+photographs ($\approx$30 min on a T4/P100), applies the fixed filter, writes
+\texttt{submission.csv}, and emits a schema/positive-area/disjointness audit; the
+output was verified byte-identical to the scored submission. An independent verifier
+(\texttt{scripts/verify\_submission.py}) re-checks schema, RLE geometry, and
+disjointness for any CSV.
+\texttt{notebooks/train\_all\_data.ipynb} retrains the final model from scratch using
+only the competition training polygons. No external solar data, pretrained solar
+models, or ground-truth metadata beyond the competition training annotations are used
+at any stage.
+
+\section{Conclusion}
+A modest, fully validated pipeline --- ConvNeXt-Tiny U-Net, rotation-averaged native
+inference, cross-fitted filtering --- reaches 0.4149 pooled development PQ (0.4382 at
+the final 32k budget) and 0.37 public score while satisfying strict disjointness, with
+byte-exact reproduction from pinned weights. The measurement study clarifies
+which mechanisms the combined all-pairs/disjoint evaluation permits, quantifies that
+per-mask consensus quality is the only remaining lever for honest submissions, and
+documents evaluation-pipeline vulnerabilities relevant to interpreting the public
+leaderboard, including a reproducible PQ-0.653 measurement of a high-scoring
+third-party artifact against public test annotations.
+
+\begin{thebibliography}{9}
+\bibitem{magfilo} A. Ahmadzadeh et al., ``MAGFiLO: A dataset of manually annotated
+solar filaments from H-$\alpha$ observations,'' \emph{Scientific Data}, 2024.
+\bibitem{pq} A. Kirillov, K. He, R. Girshick, P. Doll\'ar, ``Panoptic segmentation,''
+\emph{CVPR}, 2019.
+\bibitem{challenge} A. Ahmadzadeh, D. J. Kempton, Q. Li, A. A. Pevtsov, ``Solar
+Filament Segmentation Challenge 2026,'' Kaggle/IEEE BigData, 2026.
+\bibitem{unet} O. Ronneberger, P. Fischer, T. Brox, ``U-Net: Convolutional networks
+for biomedical image segmentation,'' \emph{MICCAI}, 2015.
+\bibitem{convnext} Z. Liu et al., ``A ConvNet for the 2020s,'' \emph{CVPR}, 2022.
+\end{thebibliography}
+
+\end{document}

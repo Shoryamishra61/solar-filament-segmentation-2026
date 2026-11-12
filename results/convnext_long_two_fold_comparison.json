@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "reference_grid": "unchanged fixed area/confidence choices on 0.5 raw masks",
+  "candidate_grid": "cosine95 matched16k4R recipe; unchanged20 area/confidence choices",
+  "reference_pq": 0.39392876230125146,
+  "candidate_pq": 0.4148878406625737,
+  "gain": 0.02095907836132227,
+  "paired_refitted_gain_interval_95_percent": [
+    0.011283764100313788,
+    0.031237799434787748
+  ],
+  "replicates": 2000,
+  "seed": 2026,
+  "photographs": 283,
+  "per_fold": [
+    {
+      "fold": 1,
+      "photos": 142,
+      "months": 24,
+      "reference_pq": 0.4073764711661059,
+      "candidate_pq": 0.4286595314932584,
+      "gain": 0.021283060327152492
+    },
+    {
+      "fold": 2,
+      "photos": 141,
+      "months": 23,
+      "reference_pq": 0.38294109602827275,
+      "candidate_pq": 0.4027006026210176,
+      "gain": 0.019759506592744835
+    }
+  ],
+  "all_folds_positive": true,
+  "decision": "KEEP_FOR_FROZEN_RECIPE_REVIEW",
+  "input_hashes": [
+    {
+      "path": "runs/cosine95-long-fold1-16384-calibration-001/calibration.json",
+      "sha256": "b682a5f05804d2465afd89dad7ed316279295a64b7353eefe2c6bacf18ea6540"
+    },
+    {
+      "path": "runs/cosine95-long-fold1-16384-calibration-001/plan.json",
+      "sha256": "2ffcbd5e2c0dbbacc5aa1912f6f02650b787bbc0d6d1eafb9926d00417fbf941"
+    },
+    {
+      "path": "runs/cosine95-long-fold1-16384-calibration-001/totals.npz",
+      "sha256": "1789a95a63629a8b51de9b960a5e2a841aa6c0770dab560e10393637a383e3bf"
+    },
+    {
+      "path": "runs/convnext-long-fold1-16384-calibration-001/calibration.json",
+      "sha256": "a45d4a46e1d0089437a92aa904f3926e7418ef5bfe16710cb8ace78958c8ab32"
+    },
+    {
+      "path": "runs/convnext-long-fold1-16384-calibration-001/plan.json",
+      "sha256": "c30c6b49d1e9d8963d8c9f6ce0eeac13f03fe8e7c92388be5b96fc61702df569"
+    },
+    {
+      "path": "runs/convnext-long-fold1-16384-calibration-001/totals.npz",
+      "sha256": "4da9be8a717940c052b050df999471030e327975eba144e3db0bfc8a91e53191"
+    },
+    {
+      "path": "runs/cosine95-long-fold2-16384-calibration-001/calibration.json",
+      "sha256": "93f39ae21559ba3c04ee41b571aa302422ff54e268d504236b2a067d680a9402"
+    },
+    {
+      "path": "runs/cosine95-long-fold2-16384-calibration-001/plan.json",
+      "sha256": "0751ee1f46d15fda5de1502efa556c6b1abcd1739c2b4a82af430db697ac12df"
+    },
+    {
+      "path": "runs/cosine95-long-fold2-16384-calibration-001/totals.npz",
+      "sha256": "5765bfc47863b7207610a4dbb84fc736bb257261da04e46c7a13f0bc9d1dcb89"
+    },
+    {
+      "path": "runs/convnext-long-fold2-16384-calibration-001/calibration.json",
+      "sha256": "da9a17cd436d0b68dbb23937d96ac2c4c4adf14d42f032760bd3a8b3ce2d4468"
+    },
+    {
+      "path": "runs/convnext-long-fold2-16384-calibration-001/plan.json",
+      "sha256": "f4a16e47cb27f2bcd21287b328768335aaa170d667e708b3016451d037ad9d64"
+    },
+    {
+      "path": "runs/convnext-long-fold2-16384-calibration-001/totals.npz",
+      "sha256": "7be3a769f3df59cf6557e1aaee4ee5f2a8a298e88a96af8f4a742a7345513dd1"
+    }
+  ],
+  "scope": "Two frozen outer development folds; paired months; no hidden-score evidence.",
+  "holdout_used": false,
+  "test_labels_used": false,
+  "public_score_used": false
+}
