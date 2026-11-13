@@ -46,12 +46,11 @@
 - [x] Public repository and notebook prepared (git history ready; **push pending user**).
 - [x] Version-pinned requirements supplied.
 - [x] Report compiled (3 pages, IEEE 2-column).
-- [ ] **Organizer Overleaf template**: NOT used — the template source requires
-      an Overleaf login this environment does not have. The report satisfies
-      the content requirements; if the organizers strictly require their
-      template, the user must export it from
-      https://www.overleaf.com/read/vjztpvrnbrdh and the content must be
-      ported (≈1 h of work; content is template-independent).
+- [x] **Organizer Overleaf template**: USED — template source (main.tex,
+      preamble.tex, main.bib) extracted from the read-only Overleaf share,
+      content ported, \guideStylefalse set, all organizer black text
+      (subtitle, Introduction sentences, Acknowledgment) preserved verbatim.
+      Compiled locally with TinyTeX acmart (3 pages).
 - [x] Google Form fields prepared (`evidence/FORM_PREP.md`); **not submitted**
       (user must complete authentication/CAPTCHA and the submission-choice).
 - [ ] Kaggle selection state: user must decide which submission(s) remain

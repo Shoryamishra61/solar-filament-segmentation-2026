@@ -30,7 +30,7 @@ final_package/
   notebooks/
     reproduce_submission.ipynb   # end-to-end: weights -> submission.csv (no training needed)
     train_all_data.ipynb         # optional: retrain the final all-data model from scratch
-  report/technical_report.tex    # 4-page technical report (IEEE two-column)
+  report/main.tex               # 4-page technical report (organizer ACM template)
   results/                       # score evidence and evaluation artifacts
   weights/                       # checkpoint .pt files (see Weights below)
   requirements.txt
